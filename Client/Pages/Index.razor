@@ -1,0 +1,46 @@
+﻿@using FavoriteMoviesFall2024.Shared;
+
+@page "/"
+
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, world!</h1>
+@if (User is not null)
+{
+    <p>list of IMDBIds for your favorite movies:</p>
+    <ul>
+        @foreach (var movie in MovieDetails)
+            {
+                <li>@movie.Title (@movie.Year)</li>
+            }
+    </ul>
+}
+
+
+@code {
+    [Inject]
+    public HttpClient httpClient { get; set; } = new();
+    public UserDto User { get; set; } = new();
+    public List<OMDBMovie> MovieDetails { get; set; } = new();
+
+    private readonly string OMDBAPIUrl = "https://www.omdbapi.com/?";
+    private readonly string OMDBAPIKey = "apikey=86c39163";
+
+    protected override async Task OnInitializedAsync()
+    {
+        User = await httpClient.GetFromJsonAsync<UserDto>("api/User");
+
+        if (User?.FavoriteMovies?.Any() ?? false)
+        {
+            foreach (var movie in User.FavoriteMovies)
+            {
+                OMDBMovie omdbMovie = await httpClient.GetFromJsonAsync<OMDBMovie>($"{OMDBAPIUrl}{OMDBAPIKey}&i={movie.imdbId}");
+                if (omdbMovie is not null)
+                {
+                    MovieDetails.Add(omdbMovie);
+                }
+            }
+        }
+        
+    }
+}
