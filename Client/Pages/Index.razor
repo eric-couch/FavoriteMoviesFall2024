@@ -8,12 +8,28 @@
 @if (User is not null)
 {
     <p>list of IMDBIds for your favorite movies:</p>
-    <ul>
+        <div class="containter">
         @foreach (var movie in MovieDetails)
             {
-                <li>@movie.Title (@movie.Year)</li>
+                <div class="row gy-3">
+                    <div class="card h-100 border rounded bg-white">
+                    <img class="card-img-top" src="@($"https://img.omdbapi.com/?{OMDBAPIKey}&i={movie.imdbID}")" style="width:100px" />
+                        <div class="card-body">
+                            @movie.Title (@movie.Year)
+                            <h6>Actors</h6>
+                            <ul class="list-group list-group-flush">
+                        @foreach (var actor in movie.Actors.Split(", "))
+                        {
+                            <li class="list-group-item">@actor</li>
+                        }
+                        </ul>
+                    </div>
+                    
+
+                </div>
+                </div>
             }
-    </ul>
+    </div>
 }
 
 
