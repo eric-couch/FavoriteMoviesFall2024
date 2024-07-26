@@ -1,4 +1,5 @@
-﻿@using FavoriteMoviesFall2024.Shared;
+﻿@using FavoriteMoviesFall2024.Shared
+@using Microsoft.AspNetCore.Components.Authorization
 
 @page "/"
 
@@ -7,28 +8,29 @@
 <h1>Hello, world!</h1>
 @if (User is not null)
 {
-    <p>list of IMDBIds for your favorite movies:</p>
-        <div class="containter">
+    <div class="containter">
+        <div class="row">
         @foreach (var movie in MovieDetails)
-            {
-                <div class="row gy-3">
-                    <div class="card h-100 border rounded bg-white">
-                    <img class="card-img-top" src="@($"https://img.omdbapi.com/?{OMDBAPIKey}&i={movie.imdbID}")" style="width:100px" />
-                        <div class="card-body">
-                            @movie.Title (@movie.Year)
-                            <h6>Actors</h6>
-                            <ul class="list-group list-group-flush">
-                        @foreach (var actor in movie.Actors.Split(", "))
-                        {
-                            <li class="list-group-item">@actor</li>
-                        }
-                        </ul>
-                    </div>
-                    
+        {
+            <div class="col-md-2 my-4">
+                <div class="card h-100 border rounded bg-white">
+                <img class="card-img-top" src="@($"https://img.omdbapi.com/?{OMDBAPIKey}&i={movie.imdbID}")" style="width:100px" />
+                    <div class="card-body">
+                        @movie.Title (@movie.Year)
+                        <h6>Actors</h6>
+                        <ul class="list-group list-group-flush">
+                    @foreach (var actor in movie.Actors.Split(", "))
+                    {
+                        <li class="list-group-item">@actor</li>
+                    }
+                    </ul>
+                </div>
+            </div>
 
-                </div>
-                </div>
-            }
+        </div>
+        
+        }
+        </div>
     </div>
 }
 
@@ -36,6 +38,9 @@
 @code {
     [Inject]
     public HttpClient httpClient { get; set; } = new();
+    [Inject]
+    public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+
     public UserDto User { get; set; } = new();
     public List<OMDBMovie> MovieDetails { get; set; } = new();
 
@@ -44,12 +49,15 @@
 
     protected override async Task OnInitializedAsync()
     {
-        User = await httpClient.GetFromJsonAsync<UserDto>("api/User");
+        var UserAuth = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User.Identity;
+
+        User = await httpClient.GetFromJsonAsync<UserDto>($"api/User?userId={UserAuth.Name}");  // this is our server (FavoriteMoviesFall2024.Server Project)
 
         if (User?.FavoriteMovies?.Any() ?? false)
         {
             foreach (var movie in User.FavoriteMovies)
             {
+                // OMDB API is a microservice
                 OMDBMovie omdbMovie = await httpClient.GetFromJsonAsync<OMDBMovie>($"{OMDBAPIUrl}{OMDBAPIKey}&i={movie.imdbId}");
                 if (omdbMovie is not null)
                 {
