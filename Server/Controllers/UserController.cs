@@ -42,4 +42,21 @@ public class UserController : Controller
         }
         
     }
+
+    [HttpPost]
+    [Route("api/add-movie")]
+    public async Task<IActionResult> AddMovie(string username, [FromBody] Movie movie)
+    {
+        var user = await _userManager.FindByNameAsync(username);
+        if (user != null)
+        {
+            user.FavoriteMovies.Add(movie);
+            await _context.SaveChangesAsync();
+            return Ok();
+        } else
+        {
+            return NotFound();
+        }
+        
+    }
 }

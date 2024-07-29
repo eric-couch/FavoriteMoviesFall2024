@@ -2,6 +2,9 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using FavoriteMoviesFall2024.Client;
+using Syncfusion.Blazor;
+
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NCaF5cXmZCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWXhceXVRRmVYUE1zWko=");
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -14,5 +17,5 @@ builder.Services.AddHttpClient("FavoriteMoviesFall2024.ServerAPI", client => cli
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("FavoriteMoviesFall2024.ServerAPI"));
 
 builder.Services.AddApiAuthorization();
-
+builder.Services.AddSyncfusionBlazor();
 await builder.Build().RunAsync();

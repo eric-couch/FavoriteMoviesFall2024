@@ -51,20 +51,22 @@
     {
         var UserAuth = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User.Identity;
 
-        User = await httpClient.GetFromJsonAsync<UserDto>($"api/User?userId={UserAuth.Name}");  // this is our server (FavoriteMoviesFall2024.Server Project)
-
-        if (User?.FavoriteMovies?.Any() ?? false)
+        if (UserAuth is not null && UserAuth.IsAuthenticated)
         {
-            foreach (var movie in User.FavoriteMovies)
+            User = await httpClient.GetFromJsonAsync<UserDto>($"api/User?userId={UserAuth.Name}");  // this is our server (FavoriteMoviesFall2024.Server Project)
+
+            if (User?.FavoriteMovies?.Any() ?? false)
             {
-                // OMDB API is a microservice
-                OMDBMovie omdbMovie = await httpClient.GetFromJsonAsync<OMDBMovie>($"{OMDBAPIUrl}{OMDBAPIKey}&i={movie.imdbId}");
-                if (omdbMovie is not null)
+                foreach (var movie in User.FavoriteMovies)
                 {
-                    MovieDetails.Add(omdbMovie);
+                    // OMDB API is a microservice
+                    OMDBMovie omdbMovie = await httpClient.GetFromJsonAsync<OMDBMovie>($"{OMDBAPIUrl}{OMDBAPIKey}&i={movie.imdbId}");
+                    if (omdbMovie is not null)
+                    {
+                        MovieDetails.Add(omdbMovie);
+                    }
                 }
             }
         }
-        
     }
 }
