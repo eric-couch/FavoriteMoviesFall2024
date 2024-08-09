@@ -1,0 +1,20 @@
+﻿@page "/eventhandler"
+
+<h3>@value</h3>
+<input type="text" @onkeypress="onKeyPress" />
+
+@code {
+    public string value { get; set; } = "test";
+    public string strBuild { get; set; } = string.Empty;
+
+
+    private void onChange(ChangeEventArgs args) {
+        value = (string)args.Value;
+    }
+
+    private void onKeyPress(KeyboardEventArgs args)
+    {
+        strBuild += args.Key;
+        value = strBuild;
+    }
+}

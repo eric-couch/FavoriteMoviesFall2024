@@ -1,0 +1,14 @@
+﻿@using FavoriteMoviesFall2024.Client.Services
+
+@inject ToastService ToastService
+@implements IDisposable
+
+<div class="ec-toast @(_isVisible ? "ec-toast-visible" : null) @_backgroundCssClass">
+    <div class="ec-toast-icon">
+        <i class="fa fa-@_iconCssClass" aria-hidden="true"></i>
+    </div>
+    <div class="ec-toast-body">
+        <h5>@_heading</h5>
+        <p>@_message</p>
+    </div>
+</div>

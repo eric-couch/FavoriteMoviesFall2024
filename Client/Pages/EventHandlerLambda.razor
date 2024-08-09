@@ -1,0 +1,22 @@
+﻿@page "/eventhandlerlambda"
+
+<h3>@heading</h3>
+<p>
+    <button @onclick="updateCoords">update heading</button>
+</p>
+
+<p>x coordintes on click: @xCoord</p>
+<p>y coordintes on click: @yCoord</p>
+
+
+@code {
+    public string heading { get; set; } = "initial heading";
+    public int xCoord { get; set; } = 0;
+    public int yCoord { get; set; } = 0;
+
+    public void updateCoords(MouseEventArgs args)
+    {
+        xCoord = (int)args.PageX;
+        yCoord = (int)args.PageY;
+    }
+}

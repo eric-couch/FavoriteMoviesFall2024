@@ -3,6 +3,11 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Notifications
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+@inject ToastService toastService
+
 
 <label>Search</label>
 
@@ -40,45 +45,12 @@
     </div>
 }
 
-@code {
-    [Inject]
-    public HttpClient httpClient { get; set; } = new();
-    [Inject]
-    public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
-    private MovieSearchResult searchResults { get; set; } = new();
-    private string searchTerm;
-    private MovieSearchResultItem SelectedMovie;
-
-    private List<MovieSearchResultItem> OMDBMovies { get; set; } = new();
-
-    private readonly string OMDBAPIUrl = "https://www.omdbapi.com/?";
-    private readonly string OMDBAPIKey = "apikey=86c39163";
-
-    public async Task GetSelectedRows(RowSelectEventArgs<MovieSearchResultItem> args)
-    {
-        SelectedMovie = args.Data;
-    }
-
-    public async Task ToolbarClickHandler(ClickEventArgs args)
-    {
-        if (args.Item.Id == "GridMovieAdd")
-        {
-            Movie newMovie = new Movie
-                {
-                    imdbId = SelectedMovie.imdbID
-                };
-
-            var UserAuth = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User.Identity;
-            var res = await httpClient.PostAsJsonAsync($"api/add-movie?username={UserAuth.Name}", newMovie);
-        }
-    }
-
-    private async Task SearchOMDB()
-    {
-        searchResults = await httpClient.GetFromJsonAsync<MovieSearchResult>($"{OMDBAPIUrl}{OMDBAPIKey}&s={searchTerm}");
-        if (searchResults?.Search?.Any() ?? false)
-        {
-            OMDBMovies = searchResults.Search.ToList();
-        }
-    }
-}
+@* <SfToast    @ref="ToastObj"
+            ShowCloseButton="true"
+            ShowProgressBar="true"
+            Content="@toastContent"
+            CssClass="@toastCss"
+            Timeout="3000"
+            Icon="e-check-large">
+    <ToastPosition X="Center" Y="Top"></ToastPosition>
+</SfToast> *@

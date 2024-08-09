@@ -1,0 +1,17 @@
+﻿<h3>FooComponent</h3>
+
+<p>The meaning of life is @MeaningOfLife</p>
+
+<button @onclick="someMethod">Change meaning of life</button>
+
+@code {
+    [CascadingParameter]
+    public int MeaningOfLife { get; set; } = 42;
+    [Parameter]
+    public EventCallback<int> MeaningOfLifeChanged { get; set; }
+
+    private async void someMethod()
+    {
+        await MeaningOfLifeChanged.InvokeAsync();
+    }
+}

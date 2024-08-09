@@ -99,3 +99,66 @@ a, .btn-link {
     .loading-progress-text:after {
         content: var(--blazor-load-percentage-text, "Loading");
     }
+
+
+.ec-toast {
+    display: none;
+    padding: 1rem;
+    color: #fff;
+    z-index: 999;
+    position: absolute;
+    width: 20rem;
+    top: 1.5rem;
+    right: 1.5rem;
+    border-radius: 1.5rem;
+    font-size: 0.875rem; /* Smaller text size */
+    opacity: 0; /* Initial state for fadeout */
+    transition: opacity 1.5s ease-in-out;
+}
+
+.ec-toast-icon {
+    display: flex;
+    justify-content: center;
+    padding: 0 0.5rem;
+    font-size: 1.5rem; /* Smaller icon size */
+}
+
+.ec-toast-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding-left: 0.5rem;
+}
+
+    .ec-toast-body p {
+        margin: 0;
+        font-size: 0.875rem; /* Ensure smaller text size for paragraph */
+    }
+
+.ec-toast-visible {
+    display: flex;
+    animation: fadein 1.5s ease-in forwards, fadeout 1.5s ease-in 3s forwards; /* Apply both fadein and fadeout */
+    position: fixed;
+    left: 50%;
+    margin-left: -10rem;
+}
+
+@keyframes fadein {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeout {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
