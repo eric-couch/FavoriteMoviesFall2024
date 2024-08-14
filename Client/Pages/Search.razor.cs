@@ -5,6 +5,7 @@ using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Notifications;
 using Syncfusion.Blazor.Navigations;
 using System.Net.Http.Json;
+using Syncfusion.Blazor.PivotView;
 
 namespace FavoriteMoviesFall2024.Client.Pages;
 
@@ -15,11 +16,16 @@ public partial class Search
     [Inject]
     public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
     private MovieSearchResult searchResults { get; set; } = new();
+
     private string searchTerm;
-    private MovieSearchResultItem SelectedMovie;
+    private MovieSearchResultItem? SelectedMovie = null;
+    private OMDBMovie? omdbMovie { get; set; } = null;
     public SfToast ToastObj { get; set; } = null!;
     public string toastContent { get; set; } = String.Empty;
     public string toastCss = "e-toast-success";
+    private SfPager? Page;
+    private int totalItems { get; set; } = 0;
+    private int page {  get; set; } = 1;
 
     private List<MovieSearchResultItem> OMDBMovies { get; set; } = new();
 
@@ -29,6 +35,13 @@ public partial class Search
     public async Task GetSelectedRows(RowSelectEventArgs<MovieSearchResultItem> args)
     {
         SelectedMovie = args.Data;
+        omdbMovie = await httpClient.GetFromJsonAsync<OMDBMovie>($"{OMDBAPIUrl}{OMDBAPIKey}&i={SelectedMovie.imdbID}");
+    }
+
+    public async Task PageClick(PagerItemClickEventArgs args)
+    {
+        page = args.CurrentPage;
+        await SearchOMDB();
     }
 
     public async Task ToolbarClickHandler(ClickEventArgs args)
@@ -50,9 +63,6 @@ public partial class Search
         var res = await httpClient.PostAsJsonAsync($"api/add-movie?username={UserAuth.Name}", newMovie);
         if (res.IsSuccessStatusCode)
         {
-            //toastContent = $"Movie {SelectedMovie.Title} added to your favorites.";
-            //StateHasChanged();
-            //await ToastObj.ShowAsync();
             toastService.ShowToast($"Movie {SelectedMovie.Title} added to your favorites.", Services.ToastLevel.Success, 5000);
             StateHasChanged();
         } else
@@ -64,10 +74,11 @@ public partial class Search
 
     private async Task SearchOMDB()
     {
-        searchResults = await httpClient.GetFromJsonAsync<MovieSearchResult>($"{OMDBAPIUrl}{OMDBAPIKey}&s={searchTerm}");
+        searchResults = await httpClient.GetFromJsonAsync<MovieSearchResult>($"{OMDBAPIUrl}{OMDBAPIKey}&s={searchTerm}&page={page}");
         if (searchResults?.Search?.Any() ?? false)
         {
             OMDBMovies = searchResults.Search.ToList();
+            totalItems = Int32.Parse(searchResults.totalResults);
         }
     }
 }

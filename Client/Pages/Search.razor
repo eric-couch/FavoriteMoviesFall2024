@@ -27,7 +27,8 @@
 {
     <div class="container-fluid">
             <div class="row">
-                <div class="col">
+                <div class="col-9">
+                    <SfPager @ref="Page" PageSize="10" TotalItemsCount="@totalItems" ItemClick="PageClick"></SfPager>
                     <SfGrid DataSource="OMDBMovies"
                             TValue="MovieSearchResultItem"
                             Toolbar="@(new List<object>() { new ItemModel() { Text="Add Movie", PrefixIcon="e-add", Id="GridMovieAdd"}})">
@@ -41,16 +42,14 @@
                         </GridColumns>
                     </SfGrid>
                 </div>
+                <div class="col">
+                @if (omdbMovie is not null)
+                {
+                    <MovieDetails Movie="omdbMovie" AllowDelete="false" />
+                }
+                </div>
             </div>
     </div>
 }
 
-@* <SfToast    @ref="ToastObj"
-            ShowCloseButton="true"
-            ShowProgressBar="true"
-            Content="@toastContent"
-            CssClass="@toastCss"
-            Timeout="3000"
-            Icon="e-check-large">
-    <ToastPosition X="Center" Y="Top"></ToastPosition>
-</SfToast> *@
+

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace FavoriteMoviesFall2024.Server.Controllers;
 
@@ -21,25 +22,24 @@ public class UserController : Controller
 
     [HttpGet]
     [Route("api/User")]
-    public async Task<IActionResult> GetMovies(string userId)
+    public async Task<IActionResult> GetMovies()
     {
-        if (userId is not null)
-        {
-            var user = await _userManager.FindByNameAsync(userId);
+        var user = await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            var movies = await _context.Users.Include(u => u.FavoriteMovies)
-                            .Select(u => new UserDto
-                            {
-                                Id = u.Id,
-                                FavoriteMovies = u.FavoriteMovies
-                            })
-                            .FirstOrDefaultAsync(u => u.Id == user.Id);
-
-            return Ok(user);
-        } else
+        if (user is null)
         {
             return NotFound();
         }
+
+        var movies = await _context.Users.Include(u => u.FavoriteMovies)
+                        .Select(u => new UserDto
+                        {
+                            Id = u.Id,
+                            FavoriteMovies = u.FavoriteMovies
+                        })
+                        .FirstOrDefaultAsync(u => u.Id == user.Id);
+
+        return Ok(user);
         
     }
 
@@ -58,5 +58,23 @@ public class UserController : Controller
             return NotFound();
         }
         
+    }
+
+    [HttpPost]
+    [Route("api/remove-movie")]
+    public async Task<IActionResult> RemoveMovie([FromBody] Movie movie)
+    {
+        var user = await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+        if (user is null) { 
+            return NotFound();
+        }
+
+        var movieToRemove = _context.Users.Include(u => u.FavoriteMovies).FirstOrDefault(u => u.Id == user.Id)
+                            .FavoriteMovies.FirstOrDefault(m => m.imdbId == movie.imdbId);
+
+        _context.Movies.Remove(movieToRemove);
+        _context.SaveChanges();
+        return Ok();
     }
 }

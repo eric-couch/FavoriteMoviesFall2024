@@ -2,21 +2,19 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components;
 using System.Net.Http.Json;
+using FavoriteMoviesFall2024.Client.HttpRepo;
 
 namespace FavoriteMoviesFall2024.Client.Pages;
 
 public partial class Index
 {
     [Inject]
-    public HttpClient httpClient { get; set; } = new();
+    public IUserMoviesHttpRepository UserMoviesHttpRepository { get; set; }
     [Inject]
     public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
 
     public UserDto User { get; set; } = new();
     public List<OMDBMovie> MovieDetails { get; set; } = new();
-
-    private readonly string OMDBAPIUrl = "https://www.omdbapi.com/?";
-    private readonly string OMDBAPIKey = "apikey=86c39163";
 
     protected override async Task OnInitializedAsync()
     {
@@ -24,20 +22,23 @@ public partial class Index
 
         if (UserAuth is not null && UserAuth.IsAuthenticated)
         {
-            User = await httpClient.GetFromJsonAsync<UserDto>($"api/User?userId={UserAuth.Name}");  // this is our server (FavoriteMoviesFall2024.Server Project)
+            MovieDetails = await UserMoviesHttpRepository.GetMovies();
+        }
+    }
 
-            if (User?.FavoriteMovies?.Any() ?? false)
-            {
-                foreach (var movie in User.FavoriteMovies)
-                {
-                    // OMDB API is a microservice
-                    OMDBMovie omdbMovie = await httpClient.GetFromJsonAsync<OMDBMovie>($"{OMDBAPIUrl}{OMDBAPIKey}&i={movie.imdbId}");
-                    if (omdbMovie is not null)
-                    {
-                        MovieDetails.Add(omdbMovie);
-                    }
-                }
-            }
+    private async Task RemoveFavoriteMovie(OMDBMovie movie)
+    {
+        bool res = await UserMoviesHttpRepository.RemoveMovie(movie.imdbID);
+        if (res)
+        {
+            MovieDetails.Remove(movie);
+            StateHasChanged();
+            toastService.ShowToast($"Removed movie {movie.Title} sucessfully.", Services.ToastLevel.Success, 5000);
+            StateHasChanged();
+        } else
+        {
+            toastService.ShowToast($"Failed to remove movie {movie.Title}.", Services.ToastLevel.Error, 5000);
+            StateHasChanged();
         }
     }
 }

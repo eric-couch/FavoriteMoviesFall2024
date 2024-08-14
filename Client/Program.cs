@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using FavoriteMoviesFall2024.Client;
 using Syncfusion.Blazor;
 using FavoriteMoviesFall2024.Client.Services;
+using FavoriteMoviesFall2024.Client.HttpRepo;
 
 Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NCaF5cXmZCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWXhceXVRRmVYUE1zWko=");
 
@@ -20,4 +21,5 @@ builder.Services.AddScoped<ToastService>();
 
 builder.Services.AddApiAuthorization();
 builder.Services.AddSyncfusionBlazor();
+builder.Services.AddScoped<IUserMoviesHttpRepository, UserMoviesHttpRepository>();
 await builder.Build().RunAsync();
