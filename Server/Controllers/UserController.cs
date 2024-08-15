@@ -13,10 +13,14 @@ public class UserController : Controller
 {
     private readonly ApplicationDbContext _context;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly RoleManager<IdentityRole> _roleManager;
 
-    public UserController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+    public UserController(  ApplicationDbContext context, 
+                            RoleManager<IdentityRole> roleManager,
+                            UserManager<ApplicationUser> userManager)
     {
         _context = context;
+        _roleManager = roleManager;
         _userManager = userManager;
     }
 
@@ -24,7 +28,8 @@ public class UserController : Controller
     [Route("api/User")]
     public async Task<IActionResult> GetMovies()
     {
-        var user = await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        //var user = await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        var user = await _userManager.FindByNameAsync(User.Identity.Name);
 
         if (user is null)
         {
@@ -61,6 +66,7 @@ public class UserController : Controller
     }
 
     [HttpPost]
+    [Authorize(Roles ="admin")]
     [Route("api/remove-movie")]
     public async Task<IActionResult> RemoveMovie([FromBody] Movie movie)
     {

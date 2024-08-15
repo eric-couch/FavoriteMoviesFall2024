@@ -42,6 +42,11 @@ public class UserMoviesHttpRepository : IUserMoviesHttpRepository
         
         Movie newMovie = new Movie { imdbId = imdbId };
         var res = await _httpClient.PostAsJsonAsync("api/remove-movie", newMovie);
+        if (res.StatusCode == System.Net.HttpStatusCode.Found)
+        {
+            return false;
+        }
+
         if (!res.IsSuccessStatusCode)
         {
             return false;
