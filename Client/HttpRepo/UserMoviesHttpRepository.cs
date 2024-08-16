@@ -1,5 +1,6 @@
 ﻿using FavoriteMoviesFall2024.Client.Pages;
 using FavoriteMoviesFall2024.Shared;
+using FavoriteMoviesFall2024.Shared.Wrapper;
 using Microsoft.AspNetCore.Components.Authorization;
 using Syncfusion.Blazor.PivotView;
 using System.Net.Http;
@@ -17,40 +18,45 @@ public class UserMoviesHttpRepository : IUserMoviesHttpRepository
     {
         _httpClient = httpClient;
     }
-
-    public async Task<List<OMDBMovie>> GetMovies()
+    
+    public async Task<DataResponse<List<OMDBMovie>>> GetMovies()
     {
         var MovieDetails = new List<OMDBMovie>();
-        UserDto User = await _httpClient.GetFromJsonAsync<UserDto>($"api/User");  // this is our server (FavoriteMoviesFall2024.Server Project)
+        DataResponse<UserDto> res = await _httpClient.GetFromJsonAsync<DataResponse<UserDto>>($"api/User");  // this is our server (FavoriteMoviesFall2024.Server Project)
 
-        if (User?.FavoriteMovies?.Any() ?? false)
+        if (res.Succeeded)
         {
-            foreach (var movie in User.FavoriteMovies)
+            UserDto User = res.Data;
+            if (User?.FavoriteMovies?.Any() ?? false)
             {
-                // OMDB API is a microservice
-                OMDBMovie omdbMovie = await _httpClient.GetFromJsonAsync<OMDBMovie>($"{OMDBAPIUrl}{OMDBAPIKey}&i={movie.imdbId}");
-                if (omdbMovie is not null)
+                foreach (var movie in User.FavoriteMovies)
                 {
-                    MovieDetails.Add(omdbMovie);
+                    // OMDB API is a microservice
+                    OMDBMovie omdbMovie = await _httpClient.GetFromJsonAsync<OMDBMovie>($"{OMDBAPIUrl}{OMDBAPIKey}&i={movie.imdbId}");
+                    if (omdbMovie is not null)
+                    {
+                        MovieDetails.Add(omdbMovie);
+                    }
                 }
             }
         }
-        return MovieDetails;
-    }
-    public async Task<bool> RemoveMovie(string imdbId)
-    {
-        
-        Movie newMovie = new Movie { imdbId = imdbId };
-        var res = await _httpClient.PostAsJsonAsync("api/remove-movie", newMovie);
-        if (res.StatusCode == System.Net.HttpStatusCode.Found)
-        {
-            return false;
-        }
 
-        if (!res.IsSuccessStatusCode)
+        
+        return new DataResponse<List<OMDBMovie>>(MovieDetails);
+    }
+    public async Task<Response> RemoveMovie(string imdbId)
+    {
+        try
         {
-            return false;
+            Movie newMovie = new Movie { imdbId = imdbId };
+            var res = await _httpClient.PostAsJsonAsync("api/remove-movie", newMovie);
+            Response response = await res.Content.ReadFromJsonAsync<Response>();
+            return response;
+        } catch (Exception ex)
+        {
+            return new Response("Remove movie failed.");
         }
-        return true;
+        
+
     }
 }

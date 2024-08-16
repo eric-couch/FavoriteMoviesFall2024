@@ -190,7 +190,9 @@ public class HttpUserMoviesRepositoryTests
 
 
         // Act
-        var movies = await userMoviesHttpRepo.GetMovies();
+        var res = await userMoviesHttpRepo.GetMovies();
+
+        var movies = res.Data;
         
         // Assert 
         Assert.That(movies.Count(), Is.EqualTo(3));

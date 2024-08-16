@@ -10,21 +10,19 @@ namespace FavoriteMoviesFall2024.Server.Data;
 
 public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>
 {
-    //private RoleManager<ApplicationUser> roleManager;
-
     public ApplicationDbContext(
         DbContextOptions options,
-        //RoleManager<ApplicationUser> _roleManager,
         IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)
     {
-        //roleManager = _roleManager;
     }
 
     public DbSet<Movie> Movies => Set<Movie>();
 
-    //protected override void OnModelCreating(ModelBuilder builder)
-    //{
-    //    //roleManager.CreateAsync("Admin");
-    //    //User.Roles.Add("Admin");
-    //}
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+
+        //builder.Entity<IdentityRole>().HasData(new IdentityRole { Name = "User", NormalizedName = "USER", Id = Guid.NewGuid().ToString(), ConcurrencyStamp = Guid.NewGuid().ToString() });
+        builder.Entity<IdentityRole>().HasData(new IdentityRole { Name = "Admin", NormalizedName = "ADMIN", Id = Guid.NewGuid().ToString(), ConcurrencyStamp = Guid.NewGuid().ToString() });
+    }
 }

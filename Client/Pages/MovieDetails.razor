@@ -1,27 +1,27 @@
 ﻿@if (Movie is not null)
 {
-    <div class="card h-100 border rounded bg-white" style="width: 15rem;">
-        <img class="card-img-top" src="@($"https://img.omdbapi.com/?apikey=86c39163&i={Movie.imdbID}")" style="width:100px" />
-        <div class="card-body">
-            <p class="card-text">@Movie.Title (@Movie.Year)</p>
-            <p class="card-text">Actors</p>
-            <ul class="list-group list-group-flush">
+    <div class="card h-100 border rounded bg-white" style="width: 12rem;">
+        <img class="card-img-top" src="@($"https://img.omdbapi.com/?apikey=86c39163&i={Movie.imdbID}")" />
+        <div class="card-body small-text">
+            <p class="card-text fw-bold">@Movie.Title (@Movie.Year)</p>
+            <p class="card-text fw-bold">Actors</p>
+            <ul class="list-group list-group-flush p-0 pb-3">
                 @foreach (var actor in Movie.Actors.Split(", "))
                 {
-                    <li class="list-group-item">@actor</li>
+                    <li class="list-group-item p-0">@actor</li>
                 }
             </ul>
             <p class="card-text">Runtime: @Movie.Runtime</p>
             <p class="card-text">Rated: @Movie.Rated</p>
-            <ul class="list-group list-group-flush">
+            <ul class="list-group list-group-flush small-text">
                 @foreach (var rating in Movie.Ratings)
                 {
                     <li class="list-group-item">@rating.Source : (@rating.Value)</li>
                 }
             </ul>
-            @if (AllowDelete)
+            @if (AllowDelete && ShowDelete)
             {
-                <button class="btn btn-primary" @onclick="@(() => RemoveFavoriteMovie(@Movie))">Remove</button>
+                <button class="btn btn-primary btn-sm" @onclick="@(() => RemoveFavoriteMovie(@Movie))">Remove</button>
             }
         </div>
     </div>

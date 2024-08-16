@@ -1,9 +1,10 @@
 ﻿using FavoriteMoviesFall2024.Shared;
+using FavoriteMoviesFall2024.Shared.Wrapper;
 
 namespace FavoriteMoviesFall2024.Client.HttpRepo;
 
 public interface IUserMoviesHttpRepository
 {
-    Task<List<OMDBMovie>> GetMovies();
-    Task<bool> RemoveMovie(string imdbId);
+    Task<DataResponse<List<OMDBMovie>>> GetMovies();
+    Task<Response> RemoveMovie(string imdbId);
 }

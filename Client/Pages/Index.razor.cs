@@ -1,4 +1,5 @@
 ﻿using FavoriteMoviesFall2024.Shared;
+using FavoriteMoviesFall2024.Shared.Wrapper;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components;
 using System.Net.Http.Json;
@@ -22,14 +23,22 @@ public partial class Index
 
         if (UserAuth is not null && UserAuth.IsAuthenticated)
         {
-            MovieDetails = await UserMoviesHttpRepository.GetMovies();
+            var res = await UserMoviesHttpRepository.GetMovies();
+            if (res.Succeeded)
+            {
+                MovieDetails = res.Data;
+            } else
+            {
+                // show toast what went wrong!!!
+            }
+
         }
     }
 
     private async Task RemoveFavoriteMovie(OMDBMovie movie)
     {
-        bool res = await UserMoviesHttpRepository.RemoveMovie(movie.imdbID);
-        if (res)
+        Response res = await UserMoviesHttpRepository.RemoveMovie(movie.imdbID);
+        if (res.Succeeded)
         {
             MovieDetails.Remove(movie);
             StateHasChanged();
@@ -37,7 +46,7 @@ public partial class Index
             StateHasChanged();
         } else
         {
-            toastService.ShowToast($"Failed to remove movie {movie.Title}.", Services.ToastLevel.Error, 5000);
+            toastService.ShowToast($"{res.Message}", Services.ToastLevel.Error, 5000);
             StateHasChanged();
         }
     }

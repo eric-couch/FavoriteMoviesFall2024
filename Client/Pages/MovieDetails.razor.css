@@ -1,0 +1,19 @@
+﻿/* Make text smaller in the card body */
+.small-text {
+    font-size: 0.6rem; /* Adjust size as needed */
+}
+
+.card-body .list-group-item {
+    padding: 0.2rem; /* Adjust padding for a compact look */
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem; /* Smaller button size */
+    font-size: 0.75rem; /* Smaller text in button */
+}
+
+#p {
+    padding: 0px;
+    margin: 0px;
+    margin-bottom: .2rem;
+}
