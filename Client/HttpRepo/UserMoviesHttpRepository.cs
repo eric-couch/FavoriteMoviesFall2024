@@ -44,6 +44,35 @@ public class UserMoviesHttpRepository : IUserMoviesHttpRepository
         
         return new DataResponse<List<OMDBMovie>>(MovieDetails);
     }
+
+    public async Task<DataResponse<List<UserEditDto>>> GetUsers()
+    {
+        try
+        {
+            var res = await _httpClient.GetFromJsonAsync<DataResponse<List<UserEditDto>>>("api/users");
+            if (res?.Succeeded ?? false)
+            {
+                return new DataResponse<List<UserEditDto>>(res.Data);
+            } else
+            {
+                return new DataResponse<List<UserEditDto>>()
+                {
+                    Succeeded = false,
+                    Message = "Users list not found",
+                    Data = new List<UserEditDto>()
+                };
+            }
+        } catch (Exception ex)
+        {
+            return new DataResponse<List<UserEditDto>>()
+            {
+                Succeeded = false,
+                Message = ex.Message,
+                Data = new List<UserEditDto>()
+            };
+        }
+    }
+
     public async Task<Response> RemoveMovie(string imdbId)
     {
         try

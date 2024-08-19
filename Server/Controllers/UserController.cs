@@ -51,6 +51,42 @@ public class UserController : Controller
         
     }
 
+    [HttpGet]
+    [Route("api/users")]
+    public async Task<DataResponse<List<UserEditDto>>> GetUsers()
+    {
+        try
+        {
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+            // add null check
+            var users = await (from u in _context.Users
+                                let query = (from ur in _context.Set<IdentityUserRole<string>>()
+                                      where ur.UserId.Equals(u.Id)
+                                      join r in _context.Roles on ur.RoleId equals r.Id
+                                      select r.Name).ToList()
+                               select new UserEditDto
+                               {
+                                   Id = u.Id,
+                                   UserName = u.UserName,
+                                   Email = u.Email,
+                                   EmailConfirmed = u.EmailConfirmed,
+                                   LockoutEnabled = u.LockoutEnabled,
+                                   Admin = query.Contains("Admin")
+                               }).ToListAsync();
+
+            return new DataResponse<List<UserEditDto>>(users);
+        }
+        catch (Exception e)
+        {
+            Debug.WriteLine(e.Message);
+            return new DataResponse<List<UserEditDto>>()
+            {
+                Succeeded = false,
+                Message = e.Message
+            };
+        }
+    }
+
     [HttpPost]
     [Route("api/add-movie")]
     public async Task<IActionResult> AddMovie(string username, [FromBody] Movie movie)
