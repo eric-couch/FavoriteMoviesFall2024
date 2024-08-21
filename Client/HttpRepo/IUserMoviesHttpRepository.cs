@@ -8,4 +8,7 @@ public interface IUserMoviesHttpRepository
     Task<DataResponse<List<OMDBMovie>>> GetMovies();
     Task<Response> RemoveMovie(string imdbId);
     Task<DataResponse<List<UserEditDto>>> GetUsers();
+    Task<Response> ToggleEnabledUser(string userId);
+
+    Task<Response> ToggleAdminRole(string userId);
 }

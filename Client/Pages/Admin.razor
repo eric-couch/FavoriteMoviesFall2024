@@ -1,6 +1,7 @@
 ﻿@page "/admin"
 @using FavoriteMoviesFall2024.Shared
 @using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Buttons
 @inject ToastService toastService
 
 
@@ -13,6 +14,32 @@
                 <GridColumns>
                     <GridColumn Field="UserName"></GridColumn>
                     <GridColumn Field="Email"></GridColumn>
+                    <GridColumn Field="EmailConfirmed">
+                    </GridColumn>
+                    <GridColumn Field="LockoutEnabled">
+                        <Template>
+                            @{
+                                var userEditDto = context as UserEditDto;
+                                <span id="IsActive" title="@(userEditDto.LockoutEnabled ? "Enabled" : "Disabled")">
+                                    <SfCheckBox @bind-Checked="userEditDto.LockoutEnabled"
+                                                TChecked="bool"
+                                                @onchange="@(async (args) => await ToggleEnabledUser(args, userEditDto.Id))"></SfCheckBox>
+                                </span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field="Admin">
+                        <Template>
+                            @{
+                                var userEditDto = context as UserEditDto;
+                                <span id="IsActive" title="@(userEditDto.Admin ? "Enabled" : "Disabled")">
+                                    <SfCheckBox @bind-Checked="userEditDto.Admin"
+                                                TChecked="bool"
+                                                @onchange="@(async (args) => await ToggleAdminRole(args, userEditDto.Id))"></SfCheckBox>
+                                </span>
+                            }
+                        </Template>
+                    </GridColumn>
                 </GridColumns>
             </SfGrid>
         </div>

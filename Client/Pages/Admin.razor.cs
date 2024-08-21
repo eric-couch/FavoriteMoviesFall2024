@@ -29,4 +29,24 @@ public partial class Admin
             toastService.ShowToast($"Error retrieving users: {res.Message}.", Services.ToastLevel.Success, 5000);
         }
     }
+
+    public async Task ToggleEnabledUser(ChangeEventArgs args, string UserId)
+    {
+        Response res = await UserMoviesRepo.ToggleEnabledUser(UserId);
+        if (!res.Succeeded)
+        {
+            toastCss = "e-toast-danger";
+            toastService.ShowToast($"Error toggling enable user: {res.Message}.", Services.ToastLevel.Success, 5000);
+        }
+    }
+    public async Task ToggleAdminRole(ChangeEventArgs args, string UserId)
+    {
+        Response res = await UserMoviesRepo.ToggleAdminRole(UserId);
+        if (!res.Succeeded)
+        {
+            toastCss = "e-toast-danger";
+            toastService.ShowToast($"Error toggling admin role: {res.Message}.", Services.ToastLevel.Success, 5000);
+        }
+    }
+
 }

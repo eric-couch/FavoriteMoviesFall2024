@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Syncfusion.Blazor.PivotView;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace FavoriteMoviesFall2024.Client.HttpRepo;
 
@@ -87,5 +88,70 @@ public class UserMoviesHttpRepository : IUserMoviesHttpRepository
         }
         
 
+    }
+
+    public async Task<Response> ToggleEnabledUser(string userId)
+    {
+        try
+        {
+            var res = await _httpClient.GetFromJsonAsync<Response>($"api/toggle-enabled-user/{userId}");
+            if (!res.Succeeded)
+            {
+                return new Response("Enable User Failed");
+            } else
+            {
+                return new Response() { Succeeded = true, Message="Enabled User." };
+            }
+
+        }
+        catch (HttpRequestException ex)
+        {
+            return new Response("Http exception occured.");
+        }
+        catch(NotSupportedException ex)
+        {
+            return new Response("Not Supported exception occured.");
+        }
+        catch(JsonException ex)
+        {
+            return new Response("Json exception occured.");
+        }
+        catch (Exception ex)
+        {
+            return new Response("Enable User Failed");
+        }
+    }
+
+    public async Task<Response> ToggleAdminRole(string userId)
+    {
+        try
+        {
+            var res = await _httpClient.GetFromJsonAsync<Response>($"api/toggle-admin-role/{userId}");
+            if (!res.Succeeded)
+            {
+                return new Response("Toggle Admin Role Failed");
+            }
+            else
+            {
+                return new Response() { Succeeded = true, Message = "User added to admin." };
+            }
+
+        }
+        catch (HttpRequestException ex)
+        {
+            return new Response("Http exception occured.");
+        }
+        catch (NotSupportedException ex)
+        {
+            return new Response("Not Supported exception occured.");
+        }
+        catch (JsonException ex)
+        {
+            return new Response("Json exception occured.");
+        }
+        catch (Exception ex)
+        {
+            return new Response("Enable User Failed");
+        }
     }
 }
