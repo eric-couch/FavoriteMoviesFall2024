@@ -13,12 +13,12 @@
             </ul>
             <p class="card-text">Runtime: @Movie.Runtime</p>
             <p class="card-text">Rated: @Movie.Rated</p>
-            <ul class="list-group list-group-flush small-text">
+            @* <ul class="list-group list-group-flush small-text">
                 @foreach (var rating in Movie.Ratings)
                 {
                     <li class="list-group-item">@rating.Source : (@rating.Value)</li>
                 }
-            </ul>
+            </ul> *@
             @if (AllowDelete && ShowDelete)
             {
                 <button class="btn btn-primary btn-sm" @onclick="@(() => RemoveFavoriteMovie(@Movie))">Remove</button>

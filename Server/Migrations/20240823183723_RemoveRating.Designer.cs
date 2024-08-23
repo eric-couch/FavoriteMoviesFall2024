@@ -4,6 +4,7 @@ using FavoriteMoviesFall2024.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FavoriteMoviesFall2024.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240823183723_RemoveRating")]
+    partial class RemoveRating
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -353,33 +356,6 @@ namespace FavoriteMoviesFall2024.Server.Migrations
                     b.ToTable("OMDBMovies");
                 });
 
-            modelBuilder.Entity("FavoriteMoviesFall2024.Shared.Rating", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("OMDBMovieId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Source")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OMDBMovieId");
-
-                    b.ToTable("Ratings");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -526,15 +502,6 @@ namespace FavoriteMoviesFall2024.Server.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("FavoriteMoviesFall2024.Shared.Rating", b =>
-                {
-                    b.HasOne("FavoriteMoviesFall2024.Shared.OMDBMovie", null)
-                        .WithMany("Ratings")
-                        .HasForeignKey("OMDBMovieId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -589,11 +556,6 @@ namespace FavoriteMoviesFall2024.Server.Migrations
             modelBuilder.Entity("FavoriteMoviesFall2024.Server.Models.ApplicationUser", b =>
                 {
                     b.Navigation("FavoriteMovies");
-                });
-
-            modelBuilder.Entity("FavoriteMoviesFall2024.Shared.OMDBMovie", b =>
-                {
-                    b.Navigation("Ratings");
                 });
 #pragma warning restore 612, 618
         }

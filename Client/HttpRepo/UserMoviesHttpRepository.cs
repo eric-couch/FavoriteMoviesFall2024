@@ -1,4 +1,5 @@
-﻿using FavoriteMoviesFall2024.Client.Pages;
+﻿using Blazored.LocalStorage;
+using FavoriteMoviesFall2024.Client.Pages;
 using FavoriteMoviesFall2024.Shared;
 using FavoriteMoviesFall2024.Shared.Wrapper;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -12,11 +13,13 @@ namespace FavoriteMoviesFall2024.Client.HttpRepo;
 public class UserMoviesHttpRepository : IUserMoviesHttpRepository
 {
     public readonly HttpClient _httpClient;
+    public readonly ILocalStorageService _localStorageService;
     private readonly string OMDBAPIUrl = "https://www.omdbapi.com/?";
     private readonly string OMDBAPIKey = "apikey=86c39163";
 
-    public UserMoviesHttpRepository(HttpClient httpClient)
+    public UserMoviesHttpRepository(HttpClient httpClient, ILocalStorageService localStorage)
     {
+        _localStorageService = localStorage;
         _httpClient = httpClient;
     }
     
@@ -28,22 +31,56 @@ public class UserMoviesHttpRepository : IUserMoviesHttpRepository
         if (res.Succeeded)
         {
             UserDto User = res.Data;
-            if (User?.FavoriteMovies?.Any() ?? false)
+            if (User?.OMDBMovies?.Any() ?? false)
             {
-                foreach (var movie in User.FavoriteMovies)
-                {
-                    // OMDB API is a microservice
-                    OMDBMovie omdbMovie = await _httpClient.GetFromJsonAsync<OMDBMovie>($"{OMDBAPIUrl}{OMDBAPIKey}&i={movie.imdbId}");
-                    if (omdbMovie is not null)
-                    {
-                        MovieDetails.Add(omdbMovie);
-                    }
-                }
+                return new DataResponse<List<OMDBMovie>>(User.OMDBMovies);
+
+                //foreach (var movie in User.FavoriteMovies)
+                //{
+                //    // check if movie is in local storage.  If so, get it from local storage, otherwise call the api
+                //    OMDBMovie omdbMovie = new OMDBMovie();
+                //    omdbMovie = await _localStorageService.GetItemAsync<OMDBMovie>(movie.imdbId);
+
+
+
+                //    if (omdbMovie is null)
+                //    {
+                //        // OMDB API is a microservice
+                //        omdbMovie = await _httpClient.GetFromJsonAsync<OMDBMovie>($"{OMDBAPIUrl}{OMDBAPIKey}&i={movie.imdbId}");
+                //        if (omdbMovie is not null)
+                //        {
+                //            MovieDetails.Add(omdbMovie);
+                //            await _localStorageService.SetItemAsync<OMDBMovie>(movie.imdbId, omdbMovie);
+                //        }
+
+                //    }
+                //    else
+                //    {
+                //        MovieDetails.Add(omdbMovie);
+                //    }
+                //}
             }
+            else
+            {
+                return new DataResponse<List<OMDBMovie>>()
+                {
+                    Succeeded = false,
+                    Message = "Movies not found",
+                    Data = new List<OMDBMovie>()
+                };
+            }
+        } else
+        {
+            return new DataResponse<List<OMDBMovie>>()
+            {
+                Succeeded = false,
+                Message = "Movies not found",
+                Data = new List<OMDBMovie>()
+            };
         }
 
         
-        return new DataResponse<List<OMDBMovie>>(MovieDetails);
+        
     }
 
     public async Task<DataResponse<List<UserEditDto>>> GetUsers()

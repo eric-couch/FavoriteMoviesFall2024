@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,10 +24,11 @@ public class OMDBMovie
     public string Country { get; set; }
     public string Awards { get; set; }
     public string Poster { get; set; }
-    public Rating[] Ratings { get; set; }
+    public List<Rating> Ratings { get; set; }
     public string Metascore { get; set; }
     public string imdbRating { get; set; }
     public string imdbVotes { get; set; }
+    [Key]
     public string imdbID { get; set; }
     public string Type { get; set; }
     public string DVD { get; set; }
@@ -34,9 +37,5 @@ public class OMDBMovie
     public string Website { get; set; }
     public string Response { get; set; }
 }
-public class Rating
-{
-    public string Source { get; set; }
-    public string Value { get; set; }
-}
+
 

@@ -13,7 +13,8 @@ public partial class Index
     public IUserMoviesHttpRepository UserMoviesHttpRepository { get; set; }
     [Inject]
     public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
-
+    [Inject]
+    public ILogger<Index> Logger { get; set; }
     public UserDto User { get; set; } = new();
     public List<OMDBMovie> MovieDetails { get; set; } = new();
 
@@ -27,6 +28,7 @@ public partial class Index
             if (res.Succeeded)
             {
                 MovieDetails = res.Data;
+                Logger.LogInformation("Movies retrieved successfully.");
             } else
             {
                 // show toast what went wrong!!!

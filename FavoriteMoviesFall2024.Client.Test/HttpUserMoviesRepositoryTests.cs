@@ -1,4 +1,6 @@
 using RichardSzalay.MockHttp;
+using Moq;
+using Blazored.LocalStorage;
 using FavoriteMoviesFall2024.Client.HttpRepo;
 
 namespace FavoriteMoviesFall2024.Client.Test;
@@ -15,6 +17,9 @@ public class HttpUserMoviesRepositoryTests
     {
         // Arrange
         var mockHttp = new MockHttpMessageHandler();
+        // create an instance of a mock for localstorage
+        var mockLocalStorage = new Mock<ILocalStorageService>();
+
         string testUserResponse = """
             {
             "favoriteMovies": [
@@ -184,9 +189,12 @@ public class HttpUserMoviesRepositoryTests
         mockHttp.When("https://www.omdbapi.com/?apikey=86c39163&i=tt0468569")
             .Respond("application/json", testOMDBApiTheDarkKnightResponse);
 
+        // TODO: wire up the mockLocalstorage getitemasync method and setitemasync method responses
+
         var client = mockHttp.ToHttpClient();
         client.BaseAddress = new Uri("https://localhost:7088/");
-        var userMoviesHttpRepo = new UserMoviesHttpRepository(client);
+        
+        var userMoviesHttpRepo = new UserMoviesHttpRepository(client, mockLocalStorage.Object);
 
 
         // Act
